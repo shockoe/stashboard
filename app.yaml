@@ -7,50 +7,51 @@ derived_file_type:
 - python_precompiled
 
 handlers:
-# URLS for testing
-#- url: /tests
-#  static_dir: testing
-#  login: required
-
-#- url: /runner
-#  script: runner.py
-#  login: required
-
 - url: /css
-  static_dir: static/css
+  static_dir: stashboard/static/css
+  expiration: 90d
 
 - url: /images
-  static_dir: static/images
+  static_dir: stashboard/static/images
+  expiration: 90d
 
 - url: /js
-  static_dir: static/js
+  static_dir: stashboard/static/js
+  expiration: 90d
   
 - url: /widget
-  static_dir: static/widget
+  static_dir: stashboard/static/widget
 
 - url: /favicon\.ico
-  static_files: static/favicon.ico
+  static_files: stashboard/static/favicon.ico
   upload: static/favicon.ico
   
 - url: /check
   script: stashboard.py
   secure: optional
-  
-- url: .*
-  script: main.py
+
+- url: /admin.*
+  script: admin.py
+  secure: always
+  login: admin
+
+- url: /api.*
+  script: api.py
   secure: optional
 
-skip_files: |
- ^(.*/)?(
- (#.*#)|
- (.*~)|
- (.*\.py[co])|
- (.*/RCS/.*)|
- (\..*)|
- (dev/.*)|
- (tests/.*)|
- (docs/.*)|
- (.*\.markdown)|
- (license\.txt)|
- (setup.py)
- )$
+- url: .*
+  script: main.py
+
+skip_files:
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?README\.md
+- ^(.*/)?ChangeLog
+- ^(.*/)?License

@@ -1,0 +1,39 @@
+{% extends "admin.html" %}
+
+{% block js_end %}
+    <script type="text/javascript">
+      $(document).ready(function(){
+        stashboard.fillIndex();
+      });
+    </script>
+{% endblock %}
+
+{% block document %}
+
+      <div id="webservices">
+        
+          <table id="service-list">
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th class="today">Current</th>
+            </thead>
+
+            <tbody id="services-body">
+            </tbody>
+          </table>
+
+          <a id="add-service" class="button" href="#">Add New Service</a>
+        
+      </div>
+      
+      <div class="dialog" id="add-service-modal" title="Add New Service">
+        <label  for="service-name">Name</label>
+        <input type="text" id="service-name"name="service-name">
+        <label for="service-description">Description</label>
+        <textarea
+          id="service-description" name="service-description"></textarea>
+      </div>
+      
+{% endblock %}
+

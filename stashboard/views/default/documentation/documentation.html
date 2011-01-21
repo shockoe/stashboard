@@ -1,0 +1,38 @@
+{% extends "../base.html" %}
+
+{% block content %}
+
+  <div class="frame" id="documentation">
+
+    <h2>REST API Documentation</h2>
+    
+    <nav>
+      <ul>
+        <li {% if overview_selected %} class="selected" {% endif %}>
+          <a href="/documentation/overview">Overview</a></li>
+          
+        <li {% if rest_selected %} class="selected" {% endif %}>
+          <a href="/documentation/rest">API Reference</a></li>
+          
+        <li {% if example_selected %} class="selected" {% endif %}>
+          <a href="/documentation/examples">Examples</a></li>
+        
+      </ul>
+    </nav>
+    
+    <div>
+      
+      {% block document %}
+      
+      {% endblock %}
+      
+    </div>
+    
+    <script type="text/javascript">
+    $("code").addClass("prettyprint");
+    prettyPrint();
+    </script>
+    
+  </div>
+
+{% endblock %}

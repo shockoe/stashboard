@@ -23,72 +23,43 @@
 
 __author__ = 'Kyle Conroy'
 
-import config
 import os
-import sys
 import logging
 import wsgiref.handlers
 
-# Force sys.path to have our own directory first, so we can import from it.
-sys.path.insert(0, config.APP_ROOT_DIR)
-sys.path.insert(1, os.path.join(config.APP_ROOT_DIR, 'utils/external'))
-os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+# SITE HANDLER
 
+# Force sys.path to have our own directory first, so we can import from it.
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
 from google.appengine.api import memcache
 from google.appengine.ext import webapp
-from google.appengine.api import users
 
-from handlers import site, api
-from models import Status, Setting
-
-
-# Log a message each time this module get loaded.
-logging.info('Loading %s, app version = %s',
-             __name__, os.getenv('CURRENT_VERSION_ID'))
-           
-if (config.SITE["rich_client"]):  
-    serviceHandler = site.ServiceHandler
-    rootHandler = site.RootHandler
-else:
-    rootHandler = site.BasicRootHandler
-    serviceHandler = site.BasicServiceHandler
+from stashboard import config
+from stashboard.handlers import site
+from stashboard.models import Status, Setting
 
 ROUTES = [
-    ('/*$', rootHandler),
-    ('/debug', site.DebugHandler),
-    #('/*[^/]', site.) redirect pages without slashed to pages with slashes
-    
-    #API
+    ('/*$', site.BasicRootHandler),
     ('/403.html', site.UnauthorizedHandler),
     ('/404.html', site.NotFoundHandler),
-    (r'/api/(.+)/services', api.ServicesListHandler),
-    (r'/api/(.+)/services/(.+)/events', api.EventsListHandler),
-    (r'/api/(.+)/services/(.+)/events/current', api.CurrentEventHandler),
-    (r'/api/(.+)/services/(.+)/events/(.+)', api.EventInstanceHandler),
-    (r'/api/(.+)/services/(.+)', api.ServiceInstanceHandler),
-    (r'/api/(.+)/statuses', api.StatusesListHandler),
-    (r'/api/(.+)/statuses/(.+)', api.StatusInstanceHandler),
-    (r'/api/(.+)/status-images', api.ImagesListHandler),
-    (r'/api/(.+)/levels', api.LevelsListHandler),
-    (r'/api/.*', api.NotFoundHandler),
-    
-    #SITE
-    (r'/services/(.+)/(.+)/(.+)/(.+)', serviceHandler),
-    (r'/services/(.+)/(.+)/(.+)', serviceHandler),
-    (r'/services/(.+)/(.+)', serviceHandler),
-    (r'/services/(.+)', serviceHandler),
-    (r'/documentation/credentials', site.ProfileHandler),
-    (r'/documentation/verify', site.VerifyAccessHandler),
-    (r'/documentation/(.+)', site.DocumentationHandler),
-    
+    (r'/services/(.+)/(.+)/(.+)/(.+)', site.BasicServiceHandler),
+    (r'/services/(.+)/(.+)/(.+)', site.BasicServiceHandler),
+    (r'/services/(.+)/(.+)', site.BasicServiceHandler),
+    (r'/services/(.+)', site.ServiceSummaryHandler),
+    (r'/documentation/overview', site.DocumentationOverview),
+    (r'/documentation/examples', site.DocumentationExamples),
+    (r'/documentation/rest', site.DocumentationRest),
     ('/.*$', site.NotFoundHandler),
-    
     
 ]
 
+def application():
+    return webapp.WSGIApplication(ROUTES)
+
 def main():
     # Check if defaults have been installed
+    # Keep this for now, will be removed shortly
     installed_defaults = memcache.get("installed_defaults")
     if installed_defaults is None:
         installed_defaults = Setting.all().filter('name = ', 'installed_defaults').get()
@@ -98,8 +69,7 @@ def main():
         if not memcache.add("installed_defaults", True):
             logging.error("Memcache set failed.")
 
-    application = webapp.WSGIApplication(ROUTES, debug=config.DEBUG)
-    wsgiref.handlers.CGIHandler().run(application)
+    wsgiref.handlers.CGIHandler().run(application())
 
 if __name__ == "__main__":
     main()

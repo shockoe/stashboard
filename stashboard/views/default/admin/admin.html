@@ -1,0 +1,39 @@
+{% extends "../base.html" %}
+
+{% block content %}
+
+  <div class="frame" id="admin">
+
+    <h2>Admin Console</h2>
+    
+    <nav>
+      <ul>
+        <li {% if services_selected %} class="selected" {% endif %}>
+          <a href="/admin/services">Services</a></li>
+
+        <li {% if statuses_selected %} class="selected" {% endif %}>
+          <a href="/admin/statuses">Statuses</a></li>
+          
+        <li {% if credentials_selected %} class="selected" {% endif %}>
+          <a href="/admin/credentials">API Credentials</a></li>
+          
+      </ul>
+    </nav>
+    
+    <div>
+      
+      {% block document %}
+      
+      {% endblock %}
+      
+    </div>
+    
+    <script type="text/javascript">
+    $("code").addClass("prettyprint");
+    prettyPrint();
+    </script>
+    
+  </div>
+
+{% endblock %}
+
